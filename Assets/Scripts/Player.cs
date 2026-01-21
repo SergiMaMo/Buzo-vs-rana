@@ -1,3 +1,4 @@
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,26 +13,48 @@ public class Player : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        rig = GetComponent<Rigidbody2D>();
-        animator = GetComponent<Animator>();
+        if (GetComponent<PhotonView>().IsMine)
+        {
+
+            rig = GetComponent<Rigidbody2D>();
+            animator = GetComponent<Animator>();
+
+            Camera.main.transform.SetParent(transform);
+            Camera.main.transform.position = transform.position + (Vector3.up) + transform.forward; 
+        }
     }
 
-    // Update is called once per frame
+   
     void Update()
     {
         // Le damos velocidad pero también en el eje y porque sino se quedaría parado.
-        rig.velocity = (transform.right * speed * Input.GetAxis("Horizontal")) + (transform.up * rig.velocity.y);
 
-        if (rig.velocity.x > 0.1f) GetComponent<SpriteRenderer>().flipX = false; // Cambiamos la imagen de movimiento
-        else if (rig.velocity.x < -0.1f) GetComponent<SpriteRenderer>().flipX = true;
-
-        if (Input.GetButtonDown("Jump")  )
+        if (GetComponent<PhotonView>().IsMine)
         {
-            rig.AddForce(transform.up * jumpForce);
+            rig.velocity = (transform.right * speed * Input.GetAxis("Horizontal"))
+                           + (transform.up * rig.velocity.y);
+
+            if (rig.velocity.x > 0.1f && GetComponent<SpriteRenderer>().flipX) // Cambiamos la imagen de movimiento
+                GetComponent<PhotonView>().RPC("RotateSprite", RpcTarget.All, false);
+            else if (rig.velocity.x < 0.1f && GetComponent<SpriteRenderer>().flipX)
+                GetComponent<PhotonView>().RPC("RotateSprite", RpcTarget.All, true);
+
+            // Añadimos el salto
+            if (Input.GetButtonDown("Jump"))
+            {
+                rig.AddForce(transform.up * jumpForce);
+            }
+
+            // Añadimos la animación.
+            animator.SetFloat("VelocityX", Mathf.Abs(rig.velocity.x));
+            animator.SetFloat("VelocityY", rig.velocity.y);
         }
-
-        animator.SetFloat("VelocityX" ,Mathf.Abs(rig.velocity.x));
-        animator.SetFloat("VelocityY", rig.velocity.y);
-
     }
+
+    [PunRPC]
+    public void RotateSprite(bool rotate)
+    {
+        GetComponent<SpriteRenderer>().flipX = rotate;
+    }
+
 }
