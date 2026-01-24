@@ -20,7 +20,7 @@ public class Player : MonoBehaviour
             animator = GetComponent<Animator>();
 
             Camera.main.transform.SetParent(transform);
-            Camera.main.transform.position = transform.position + (Vector3.up) + transform.forward; 
+            Camera.main.transform.position = transform.position + (Vector3.up) + transform.forward * -10; 
         }
     }
 
@@ -54,7 +54,10 @@ public class Player : MonoBehaviour
     [PunRPC]
     public void RotateSprite(bool rotate)
     {
-        GetComponent<SpriteRenderer>().flipX = rotate;
+        if (rig.velocity.x > 0.1f && GetComponent<SpriteRenderer>().flipX) // Cambiamos la imagen de movimiento
+            GetComponent<PhotonView>().RPC("RotateSprite", RpcTarget.All, false);
+        else if (rig.velocity.x < 0.1f && GetComponent<SpriteRenderer>().flipX)
+            GetComponent<PhotonView>().RPC("RotateSprite", RpcTarget.All, true);
     }
 
 }

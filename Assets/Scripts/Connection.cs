@@ -6,10 +6,8 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 
-// Script de Unity (0 referencias en tu proyecto)
 public class Connection : MonoBehaviourPunCallbacks
 {
-    // Mensaje de Unity (0 referencias)
     private void Start()
     {
         PhotonNetwork.ConnectUsingSettings();   // Nos conectamos con los parámetros definidos.
