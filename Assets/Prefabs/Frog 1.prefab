@@ -267,7 +267,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 4
   jumpForce: 400
-  rig: {fileID: 0}
+  rig: {fileID: 9205316260807397446}
 --- !u!50 &9205316260807397446
 Rigidbody2D:
   serializedVersion: 4

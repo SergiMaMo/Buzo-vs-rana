@@ -33,14 +33,15 @@ public class Player : MonoBehaviour
         {
             rig.velocity = (transform.right * speed * Input.GetAxis("Horizontal"))
                            + (transform.up * rig.velocity.y);
-
-            if (rig.velocity.x > 0.1f && GetComponent<SpriteRenderer>().flipX) // Cambiamos la imagen de movimiento
-                GetComponent<PhotonView>().RPC("RotateSprite", RpcTarget.All, false);
-            else if (rig.velocity.x < 0.1f && GetComponent<SpriteRenderer>().flipX)
-                GetComponent<PhotonView>().RPC("RotateSprite", RpcTarget.All, true);
+            
+            Debug.Log(rig.velocity);
+            //if (rig.velocity.x > 0.1f && GetComponent<SpriteRenderer>().flipX) // Cambiamos la imagen de movimiento
+            //    GetComponent<PhotonView>().RPC("RotateSprite", RpcTarget.All, false);
+            //else if (rig.velocity.x < 0.1f && GetComponent<SpriteRenderer>().flipX)
+            //    GetComponent<PhotonView>().RPC("RotateSprite", RpcTarget.All, true);
 
             // Añadimos el salto
-            if (Input.GetButtonDown("Jump"))
+            if (Input.GetButtonDown("Jump") && rig.velocity.y < 0.1)
             {
                 rig.AddForce(transform.up * jumpForce);
             }

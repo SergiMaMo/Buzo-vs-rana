@@ -15,8 +15,8 @@ public class GameManager : MonoBehaviour
         // Ojo el nombre lo busca en una carpeta que se llama Resources
         // Y es ahí donde tenemos que meter nuestros prefabs
         if (PhotonNetwork.IsMasterClient) // Si soy el máster, soy el jugador 1.
-            PhotonNetwork.Instantiate("Frog", new Vector3(-9, -8, 0), Quaternion.identity);
+            PhotonNetwork.Instantiate("Frog 1", new Vector3(-9, -8, 0), Quaternion.identity);
         else
-            PhotonNetwork.Instantiate("VirtualGuy", new Vector3(0, -8, 0), Quaternion.identity);
+            PhotonNetwork.Instantiate("Virtual 1", new Vector3(0, -8, 0), Quaternion.identity);
     }
 }
