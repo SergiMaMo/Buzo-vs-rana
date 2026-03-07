@@ -1,64 +1,80 @@
-using Photon.Pun;
-using System.Collections;
-using System.Collections.Generic;
+ using Photon.Pun;
+using System.Security.Cryptography;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class Player : MonoBehaviour
 {
-    public float speed;
-    public float jumpForce;
-    private Animator animator;
-    public Rigidbody2D rig;
+    public float speed = 5f;
+    public float jumpForce = 200f;
 
-    // Start is called before the first frame update
+    private Rigidbody2D rig;
+    private Animator anim;
+    private SpriteRenderer sr;
+    public int maxJumps = 2;
+    private int jumpCount;
+
     void Start()
     {
+        rig = GetComponent<Rigidbody2D>();
+        anim = GetComponent<Animator>();
+        sr = GetComponent<SpriteRenderer>();
         if (GetComponent<PhotonView>().IsMine)
         {
-
-            rig = GetComponent<Rigidbody2D>();
-            animator = GetComponent<Animator>();
-
+           
             Camera.main.transform.SetParent(transform);
-            Camera.main.transform.position = transform.position + (Vector3.up) + transform.forward * -10; 
+            Camera.main.transform.position= transform.position+(Vector3.up)+transform.forward*-10;
         }
     }
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (!GetComponent<PhotonView>().IsMine) return;
 
-   
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            jumpCount = 0;
+            anim.SetBool("isGrounded", true);
+            anim.SetInteger("jumpCount", 0);
+        }
+    }
     void Update()
     {
-        // Le damos velocidad pero también en el eje y porque sino se quedaría parado.
-
+        if (PhotonNetwork.CurrentRoom.CustomProperties.ContainsKey("GameOver") &&
+        (bool)PhotonNetwork.CurrentRoom.CustomProperties["GameOver"])
+        {
+            return;
+        }
         if (GetComponent<PhotonView>().IsMine)
         {
-            rig.velocity = (transform.right * speed * Input.GetAxis("Horizontal"))
-                           + (transform.up * rig.velocity.y);
-            
-            Debug.Log(rig.velocity);
-            //if (rig.velocity.x > 0.1f && GetComponent<SpriteRenderer>().flipX) // Cambiamos la imagen de movimiento
-            //    GetComponent<PhotonView>().RPC("RotateSprite", RpcTarget.All, false);
-            //else if (rig.velocity.x < 0.1f && GetComponent<SpriteRenderer>().flipX)
-            //    GetComponent<PhotonView>().RPC("RotateSprite", RpcTarget.All, true);
+            // Movimiento horizontal
+            float moveX = Input.GetAxis("Horizontal");
+        rig.velocity = new Vector2(moveX * speed, rig.velocity.y);
 
-            // Añadimos el salto
-            if (Input.GetButtonDown("Jump") && rig.velocity.y < 0.1)
-            {
-                rig.AddForce(transform.up * jumpForce);
+            if (moveX > 0.1f && sr.flipX)
+                GetComponent<PhotonView>().RPC("RotateSprite", RpcTarget.All, false);
+            else if (moveX < -0.1f && !sr.flipX)
+                GetComponent<PhotonView>().RPC("RotateSprite", RpcTarget.All, true);
+            // Salto
+            if (Input.GetButtonDown("Jump") && jumpCount < maxJumps)
+        {
+                rig.velocity = new Vector2(rig.velocity.x, 0); // limpia Y
+                rig.AddForce(Vector2.up * jumpForce);
+
+                jumpCount++;
+
+                anim.SetBool("isGrounded", false);
+                anim.SetInteger("jumpCount", jumpCount);
             }
 
-            // Añadimos la animación.
-            animator.SetFloat("VelocityX", Mathf.Abs(rig.velocity.x));
-            animator.SetFloat("VelocityY", rig.velocity.y);
+        // PASAR VELOCIDAD AL ANIMATOR
+        anim.SetFloat("velocityX", Mathf.Abs(rig.velocity.x));
+        anim.SetFloat("velocityY", rig.velocity.y);
         }
     }
-
     [PunRPC]
     public void RotateSprite(bool rotate)
     {
-        if (rig.velocity.x > 0.1f && GetComponent<SpriteRenderer>().flipX) // Cambiamos la imagen de movimiento
-            GetComponent<PhotonView>().RPC("RotateSprite", RpcTarget.All, false);
-        else if (rig.velocity.x < 0.1f && GetComponent<SpriteRenderer>().flipX)
-            GetComponent<PhotonView>().RPC("RotateSprite", RpcTarget.All, true);
+        GetComponent<SpriteRenderer>().flipX = rotate;
     }
 
 }
