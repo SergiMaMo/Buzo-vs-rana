@@ -1,6 +1,7 @@
  using Photon.Pun;
 using System.Security.Cryptography;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 
 public class Player : MonoBehaviour
@@ -23,7 +24,7 @@ public class Player : MonoBehaviour
         {
            
             Camera.main.transform.SetParent(transform);
-            Camera.main.transform.position= transform.position+(Vector3.up)+transform.forward*-10;
+            Camera.main.transform.position= transform.position+transform.forward*-10;
         }
     }
     private void OnCollisionEnter2D(Collision2D collision)
@@ -44,6 +45,8 @@ public class Player : MonoBehaviour
         {
             return;
         }
+
+        if(!PhotonNetwork.IsConnected) SceneManager.LoadScene(0, LoadSceneMode.Single);
         if (GetComponent<PhotonView>().IsMine)
         {
             // Movimiento horizontal
