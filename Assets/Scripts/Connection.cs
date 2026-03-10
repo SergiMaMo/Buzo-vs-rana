@@ -9,8 +9,10 @@ public class Connection : MonoBehaviourPunCallbacks
     // Start is called before the first frame update
     void Start()
     {
+        
         PhotonNetwork.ConnectUsingSettings();
         PhotonNetwork.AutomaticallySyncScene = true;
+        PhotonNetwork.LeaveRoom();
     }
 
     public override void OnConnectedToMaster()
@@ -32,6 +34,7 @@ public class Connection : MonoBehaviourPunCallbacks
         if (PhotonNetwork.IsMasterClient && PhotonNetwork.CurrentRoom.PlayerCount > 1)
         {
             PhotonNetwork.LoadLevel(1);
+            
             Destroy(this);
         }
     }

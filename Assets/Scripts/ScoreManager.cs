@@ -2,10 +2,12 @@
 using UnityEngine;
 using Photon.Pun;
 using ExitGames.Client.Photon;
+using System.Collections;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 public class ScoreManager : MonoBehaviour
 {
     public static ScoreManager instance;
-    public int MonedasParaGanar = 5;
+    public int ManzanasParaGanar = 5;
     // Start is called before the first frame update
 
     private void Awake()
@@ -42,7 +44,7 @@ public class ScoreManager : MonoBehaviour
 
         PhotonNetwork.CurrentRoom.SetCustomProperties(update);
 
-        if (currentScore >= MonedasParaGanar) {
+        if (currentScore >= ManzanasParaGanar) {
 
             Hashtable endGame = new Hashtable
             {
@@ -51,6 +53,13 @@ public class ScoreManager : MonoBehaviour
             };
 
             PhotonNetwork.CurrentRoom.SetCustomProperties(endGame);
+
+            StartCoroutine(ReturnToMainMenu());
         }
+    }
+
+    public IEnumerator ReturnToMainMenu() {
+        yield return new WaitForSeconds(3f);
+        PhotonNetwork.LoadLevel(0);
     }
 }

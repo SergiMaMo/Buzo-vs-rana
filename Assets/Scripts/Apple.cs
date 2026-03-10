@@ -3,21 +3,16 @@ using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-public class Coin : MonoBehaviourPun
+public class Apple : MonoBehaviourPun
 {
-    private AudioSource audioMoneda;
+    private AudioSource audioPickUp;
     private bool recogido;
     private void Awake()
     {
-        audioMoneda = GetComponent<AudioSource>();
+        audioPickUp = GetComponent<AudioSource>();
         recogido=false;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (!PhotonNetwork.IsMasterClient) return;
@@ -41,7 +36,7 @@ public class Coin : MonoBehaviourPun
     [PunRPC]
     void ReproducirSonido()
     {
-        audioMoneda.Play();
+        audioPickUp.Play();
     }
     IEnumerator DestruirConDelay()
     {

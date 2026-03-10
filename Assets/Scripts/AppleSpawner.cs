@@ -3,25 +3,25 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 
-public class CoinSpawner : MonoBehaviour
+public class AppleSpawner : MonoBehaviour
 {
 
 
 
-    public Vector2 minPos = new Vector2(-3f, 0.1f);
-    public Vector2 maxPos = new Vector2(3f, 2f);
+    public Vector2 minPos = new Vector2(-2.5f, 0.1f);
+    public Vector2 maxPos = new Vector2(3f, 1f);
     private GameObject currentPickup;
     public float checkRadius = 0.5f;
-    public int maxTries = 20;
+    public int maxTries = 50;
     void Start()
     {
         if (PhotonNetwork.IsMasterClient)
         {
-            SpawnCoin();
+            SpawnApple();
         }
     }
 
-    public void SpawnCoin()
+    public void SpawnApple()
     {
         if (!PhotonNetwork.IsMasterClient) return;
 
@@ -37,7 +37,7 @@ public class CoinSpawner : MonoBehaviour
                     );
 
                     PhotonNetwork.Instantiate(
-                        "Coin",
+                        "Apple",
                         pos,
                         Quaternion.identity
                     );
