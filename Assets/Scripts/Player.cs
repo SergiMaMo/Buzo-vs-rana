@@ -40,39 +40,62 @@ public class Player : MonoBehaviour
     }
     void Update()
     {
-        if (PhotonNetwork.CurrentRoom.CustomProperties.ContainsKey("GameOver") &&
-        (bool)PhotonNetwork.CurrentRoom.CustomProperties["GameOver"])
-        {
-            return;
-        }
-
-        if(!PhotonNetwork.IsConnected) SceneManager.LoadScene(0, LoadSceneMode.Single);
-        if (GetComponent<PhotonView>().IsMine)
-        {
-            // Movimiento horizontal
-            float moveX = Input.GetAxis("Horizontal");
+        // Movimiento horizontal
+        float moveX = Input.GetAxis("Horizontal");
         rig.velocity = new Vector2(moveX * speed, rig.velocity.y);
 
-            if (moveX > 0.1f && sr.flipX)
-                GetComponent<PhotonView>().RPC("RotateSprite", RpcTarget.All, false);
-            else if (moveX < -0.1f && !sr.flipX)
-                GetComponent<PhotonView>().RPC("RotateSprite", RpcTarget.All, true);
-            // Salto
-            if (Input.GetButtonDown("Jump") && jumpCount < maxJumps)
+        if (moveX > 0.1f && sr.flipX)
+            GetComponent<PhotonView>().RPC("RotateSprite", RpcTarget.All, false);
+        else if (moveX < -0.1f && !sr.flipX)
+            GetComponent<PhotonView>().RPC("RotateSprite", RpcTarget.All, true);
+        // Salto
+        if (Input.GetButtonDown("Jump") && jumpCount < maxJumps)
         {
-                rig.velocity = new Vector2(rig.velocity.x, 0); // limpia Y
-                rig.AddForce(Vector2.up * jumpForce);
+            rig.velocity = new Vector2(rig.velocity.x, 0); // limpia Y
+            rig.AddForce(Vector2.up * jumpForce);
 
-                jumpCount++;
+            jumpCount++;
 
-                anim.SetBool("isGrounded", false);
-                anim.SetInteger("jumpCount", jumpCount);
-            }
+            anim.SetBool("isGrounded", false);
+            anim.SetInteger("jumpCount", jumpCount);
+        }
 
         // PASAR VELOCIDAD AL ANIMATOR
         anim.SetFloat("velocityX", Mathf.Abs(rig.velocity.x));
         anim.SetFloat("velocityY", rig.velocity.y);
-        }
+        //if (PhotonNetwork.CurrentRoom.CustomProperties.ContainsKey("GameOver") &&
+        //(bool)PhotonNetwork.CurrentRoom.CustomProperties["GameOver"])
+        //{
+        //    return;
+        //}
+
+        //if(!PhotonNetwork.IsConnected) SceneManager.LoadScene(0, LoadSceneMode.Single);
+        //if (GetComponent<PhotonView>().IsMine)
+        //{
+        //    // Movimiento horizontal
+        //    float moveX = Input.GetAxis("Horizontal");
+        //    rig.velocity = new Vector2(moveX * speed, rig.velocity.y);
+
+        //    if (moveX > 0.1f && sr.flipX)
+        //        GetComponent<PhotonView>().RPC("RotateSprite", RpcTarget.All, false);
+        //    else if (moveX < -0.1f && !sr.flipX)
+        //        GetComponent<PhotonView>().RPC("RotateSprite", RpcTarget.All, true);
+        //    // Salto
+        //    if (Input.GetButtonDown("Jump") && jumpCount < maxJumps)
+        //    {
+        //        rig.velocity = new Vector2(rig.velocity.x, 0); // limpia Y
+        //        rig.AddForce(Vector2.up * jumpForce);
+
+        //        jumpCount++;
+
+        //        anim.SetBool("isGrounded", false);
+        //        anim.SetInteger("jumpCount", jumpCount);
+        //    }
+
+        //    // PASAR VELOCIDAD AL ANIMATOR
+        //    anim.SetFloat("velocityX", Mathf.Abs(rig.velocity.x));
+        //    anim.SetFloat("velocityY", rig.velocity.y);
+        //}
     }
     [PunRPC]
     public void RotateSprite(bool rotate)
